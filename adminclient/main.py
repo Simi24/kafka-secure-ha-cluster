@@ -8,13 +8,17 @@ from kafka.admin import KafkaAdminClient, NewTopic
 print("Admin client script started")
 
 def create_topic(topic_name, num_partitions, replication_factor, bootstrap_servers):
-    admin_client = KafkaAdminClient(bootstrap_servers=bootstrap_servers,
-                                    security_protocol="SSL",
-                                    ssl_check_hostname=True,
-                                    ssl_cafile="pem/ca-root.pem"
+    admin_client = KafkaAdminClient(
+        bootstrap_servers=bootstrap_servers,
+        security_protocol="SSL",
+        ssl_cafile="/etc/kafka/secrets/client.ca",
+        ssl_certfile="/etc/kafka/secrets/client.crt",
+        ssl_keyfile="/etc/kafka/secrets/client.key"
     )
 
-    # Crea un nuovo topic con il numero di partizioni e il fattore di replica specificati
+    #TODO: Controllo del numero di broker disponibili
+    #broker_count = len(admin_client.describe_cluster().brokers)
+
     topic_list = [NewTopic(name=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
     
     try:

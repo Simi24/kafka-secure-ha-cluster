@@ -7,19 +7,6 @@ from kafka.admin import KafkaAdminClient, NewTopic
 
 print("Producer script started")
 
-def create_topic(topic_name, num_partitions, replication_factor, bootstrap_servers):
-    admin_client = KafkaAdminClient(bootstrap_servers=bootstrap_servers)
-
-    topic_list = [NewTopic(name=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
-    
-    try:
-        admin_client.create_topics(new_topics=topic_list, validate_only=False)
-        print(f"Topic '{topic_name}' creato con successo.")
-    except Exception as e:
-        print(f"Errore durante la creazione del topic '{topic_name}': {str(e)}")
-    finally:
-        admin_client.close()
-
 def create_producer():
     retries = 10
     delay = 5
@@ -32,9 +19,11 @@ def create_producer():
                 bootstrap_servers=bootstrap_servers,
                 security_protocol="SSL",
                 ssl_check_hostname=True,
-                ssl_cafile="pem/ca-root.pem",
+                ssl_cafile="/etc/kafka/secrets/client.ca",
+                ssl_certfile="/etc/kafka/secrets/client.crt",
+                ssl_keyfile="/etc/kafka/secrets/client.key",
                 value_serializer=lambda x: json.dumps(x).encode('utf-8'),
-                key_serializer=lambda v: json.dumps(v, default=self.serialize).encode("utf-8"),
+                key_serializer=lambda v: json.dumps(v).encode('utf-8'),
                 api_version=(0, 10, 1),
                 request_timeout_ms=300000,
                 metadata_max_age_ms=300000,
