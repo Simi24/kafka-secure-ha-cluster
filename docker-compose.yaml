@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 
 services:
   zoo1:
@@ -58,13 +58,11 @@ services:
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
       KAFKA_SSL_KEYSTORE_FILENAME: kafka1.keystore.jks
       KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka1.keystore.jks
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: kafka_keystore_creds
-      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka1.truststore.jks
+      KAFKA_SSL_KEYSTORE_PASSWORD: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+      KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka1.truststore.jks
-      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: /etc/kafka/secrets/kafka_truststore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: /etc/kafka/secrets/kafka_sslkey_creds
-      # KAFKA_SSL_KEYSTORE_PASSWORD: password123 # Password del keystore
-      # KAFKA_SSL_TRUSTSTORE_PASSWORD: password123 # Password del truststore
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka1.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -74,6 +72,8 @@ services:
       - zoo3
     networks:
       - kafka-network
+    env_file:
+      - .env
 
   kafka2:
     image: confluentinc/cp-kafka:latest
@@ -94,12 +94,10 @@ services:
       KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka2.keystore.jks
       KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka2.truststore.jks
       KAFKA_SSL_KEYSTORE_FILENAME: kafka2.keystore.jks
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: /etc/kafka/secrets/kafka_keystore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: /etc/kafka/secrets/kafka_sslkey_creds
       KAFKA_SSL_TRUSTSTORE_FILENAME: kkafka2.truststore.jks
-      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: /etc/kafka/secrets/kafka_truststore_creds
-      # KAFKA_SSL_KEYSTORE_PASSWORD: password123 # Password del keystore
-      # KAFKA_SSL_TRUSTSTORE_PASSWORD: password123 # Password del truststore
+      KAFKA_SSL_KEYSTORE_PASSWORD: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+      KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -109,6 +107,8 @@ services:
       - zoo3
     networks:
       - kafka-network
+    env_file:
+      - .env
 
   kafka3:
     image: confluentinc/cp-kafka:latest
@@ -129,12 +129,10 @@ services:
       KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka3.keystore.jks
       KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka3.truststore.jks
       KAFKA_SSL_KEYSTORE_FILENAME: kafka3.keystore.jks
-      KAFKA_SSL_KEYSTORE_CREDENTIALS: /etc/kafka/secrets/kafka_keystore_creds
-      KAFKA_SSL_KEY_CREDENTIALS: /etc/kafka/secrets/kafka_sslkey_creds
       KAFKA_SSL_TRUSTSTORE_FILENAME: kafka3.truststore.jks
-      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: /etc/kafka/secrets/kafka_truststore_creds
-      # KAFKA_SSL_KEYSTORE_PASSWORD: password123 # Password del keystore
-      # KAFKA_SSL_TRUSTSTORE_PASSWORD: password123 # Password del truststore
+      KAFKA_SSL_KEYSTORE_PASSWORD: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+      KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -144,6 +142,8 @@ services:
       - zoo3
     networks:
       - kafka-network
+    env_file:
+      - .env
   
   adminclient:
     build:
