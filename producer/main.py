@@ -17,11 +17,14 @@ def create_producer():
             print(f"Attempting to connect to Kafka brokers: {bootstrap_servers}")
             producer = KafkaProducer(
                 bootstrap_servers=bootstrap_servers,
-                security_protocol="SSL",
+                security_protocol="SASL_SSL",
                 ssl_check_hostname=True,
                 ssl_cafile="/etc/kafka/secrets/client.ca",
                 ssl_certfile="/etc/kafka/secrets/client.crt",
                 ssl_keyfile="/etc/kafka/secrets/client.key",
+                sasl_mechanism="PLAIN",
+                sasl_plain_username=os.environ.get('KAFKA_SASL_USERNAME'),
+                sasl_plain_password=os.environ.get('KAFKA_SASL_PASSWORD'),
                 value_serializer=lambda x: json.dumps(x).encode('utf-8'),
                 key_serializer=lambda v: json.dumps(v).encode('utf-8'),
                 api_version=(0, 10, 1),

@@ -10,14 +10,18 @@ print("Admin client script started")
 def create_topic(topic_name, num_partitions, replication_factor, bootstrap_servers):
     admin_client = KafkaAdminClient(
         bootstrap_servers=bootstrap_servers,
-        security_protocol="SSL",
+        security_protocol="SASL_SSL",
         ssl_cafile="/etc/kafka/secrets/client.ca",
         ssl_certfile="/etc/kafka/secrets/client.crt",
-        ssl_keyfile="/etc/kafka/secrets/client.key"
+        ssl_keyfile="/etc/kafka/secrets/client.key",
+        sasl_mechanism="PLAIN",
+        sasl_plain_username=os.environ.get('KAFKA_SASL_USERNAME'),
+        sasl_plain_password=os.environ.get('KAFKA_SASL_PASSWORD'),
     )
 
     #TODO: Controllo del numero di broker disponibili
-    #broker_count = len(admin_client.describe_cluster().brokers)
+    broker_count = admin_client.describe_cluster()
+    print(f"Numero di broker disponibili: {broker_count}")
 
     topic_list = [NewTopic(name=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
     

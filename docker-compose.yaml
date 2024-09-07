@@ -11,6 +11,12 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_SERVERS: zoo1:2888:3888;zoo2:2888:3888;zoo3:2888:3888
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf
+                  -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                  -DrequireClientAuthScheme=sasl
+                  -Dzookeeper.allowSaslFailedClients=false
+    volumes:
+      - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
 
@@ -24,6 +30,12 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2182
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_SERVERS: zoo1:2888:3888;zoo2:2888:3888;zoo3:2888:3888
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf
+                  -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                  -DrequireClientAuthScheme=sasl
+                  -Dzookeeper.allowSaslFailedClients=false
+    volumes:
+      - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
 
@@ -37,6 +49,12 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2183
       ZOOKEEPER_SERVER_ID: 3
       ZOOKEEPER_SERVERS: zoo1:2888:3888;zoo2:2888:3888;zoo3:2888:3888
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/secrets/zookeeper_jaas.conf
+                  -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                  -DrequireClientAuthScheme=sasl
+                  -Dzookeeper.allowSaslFailedClients=false
+    volumes:
+      - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
 
@@ -49,10 +67,13 @@ services:
       - "29092:29092"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL,DOCKER:SSL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,DOCKER:SASL_SSL
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2182,zoo3:2183"
       KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+      KAFKA_RETRY_BACKOFF_MS: 1000
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
@@ -64,6 +85,10 @@ services:
       KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka1.truststore.jks
       KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
@@ -84,21 +109,28 @@ services:
       - "29093:29093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL,DOCKER:SSL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,DOCKER:SASL_SSL
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2182,zoo3:2183"
       KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+      KAFKA_RETRY_BACKOFF_MS: 1000
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
       KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka2.keystore.jks
       KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka2.truststore.jks
       KAFKA_SSL_KEYSTORE_FILENAME: kafka2.keystore.jks
-      KAFKA_SSL_TRUSTSTORE_FILENAME: kkafka2.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka2.truststore.jks
       KAFKA_SSL_KEYSTORE_PASSWORD: ${KAFKA_SSL_KEYSTORE_PASSWORD}
       KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
       KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
@@ -119,10 +151,13 @@ services:
       - "29094:29094"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL,DOCKER:SSL
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,DOCKER:SASL_SSL
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181,zoo2:2182,zoo3:2183"
       KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 60000
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 60000
+      KAFKA_RETRY_BACKOFF_MS: 1000
       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
@@ -134,6 +169,10 @@ services:
       KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
       KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
       KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
@@ -151,19 +190,24 @@ services:
       dockerfile: Dockerfile
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-      KAFKA_SECURITY_PROTOCOL: SSL
+      KAFKA_SECURITY_PROTOCOL: SASL_SSL
       KAFKA_SSL_CAFILE: /etc/kafka/secrets/ca.crt
       KAFKA_SSL_CERTFILE: /etc/kafka/secrets/client.crt
       KAFKA_SSL_KEYFILE: /etc/kafka/secrets/client.key
+      KAFKA_SASL_MECHANISM: PLAIN
+      KAFKA_SASL_USERNAME: ${KAFKA_ADMIN_USERNAME}
+      KAFKA_SASL_PASSWORD: ${KAFKA_ADMIN_PASSWORD}
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
       - kafka1
       - kafka2
       - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 30 && echo 'Starting adminClient...' && python3 -u main.py"
+    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting adminClient...' && python3 -u main.py"
     networks:
       - kafka-network
+    env_file:
+      - .env
 
   producer:
     build:
@@ -171,19 +215,24 @@ services:
       dockerfile: Dockerfile
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-      KAFKA_SECURITY_PROTOCOL: SSL
+      KAFKA_SECURITY_PROTOCOL: SASL_SSL
       KAFKA_SSL_CAFILE: /etc/kafka/secrets/ca.crt
       KAFKA_SSL_CERTFILE: /etc/kafka/secrets/client.crt
       KAFKA_SSL_KEYFILE: /etc/kafka/secrets/client.key
+      KAFKA_SASL_MECHANISM: PLAIN
+      KAFKA_SASL_USERNAME: ${KAFKA_PRODUCER_USERNAME}
+      KAFKA_SASL_PASSWORD: ${KAFKA_PRODUCER_PASSWORD}
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
       - kafka1
       - kafka2
       - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting producer...' && python3 -u main.py"
+    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 50 && echo 'Starting producer...' && python3 -u main.py"
     networks:
       - kafka-network
+    env_file:
+      - .env
 
   consumer:
     build:
@@ -191,19 +240,24 @@ services:
       dockerfile: Dockerfile
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-      KAFKA_SECURITY_PROTOCOL: SSL
+      KAFKA_SECURITY_PROTOCOL: SASL_SSL
       KAFKA_SSL_CAFILE: /etc/kafka/secrets/ca.crt
       KAFKA_SSL_CERTFILE: /etc/kafka/secrets/client.crt
       KAFKA_SSL_KEYFILE: /etc/kafka/secrets/client.key
+      KAFKA_SASL_MECHANISM: PLAIN
+      KAFKA_SASL_USERNAME: ${KAFKA_CONSUMER_USERNAME}
+      KAFKA_SASL_PASSWORD: ${KAFKA_CONSUMER_PASSWORD}
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
       - kafka1
       - kafka2
       - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting consumer...' && python3 -u main.py"
+    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 50 && echo 'Starting consumer...' && python3 -u main.py"
     networks:
       - kafka-network
+    env_file:
+      - .env
 
 networks:
   kafka-network:
