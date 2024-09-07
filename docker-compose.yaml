@@ -105,7 +105,6 @@ services:
       KAFKA_SSL_CLIENT_AUTH: required
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -156,7 +155,6 @@ services:
       KAFKA_SSL_CLIENT_AUTH: required
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -207,7 +205,6 @@ services:
       KAFKA_SSL_CLIENT_AUTH: required
       KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      # KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_SSL
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_jaas.conf -Dzookeeper.sasl.client=true"
     volumes:
       - ./ssl:/etc/kafka/secrets
@@ -251,7 +248,6 @@ services:
         condition: service_healthy
       kafka3:
         condition: service_healthy
-    # command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting adminClient...' && python3 -u main.py"
     networks:
       - kafka-network
     env_file:
