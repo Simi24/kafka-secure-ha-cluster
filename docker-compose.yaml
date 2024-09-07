@@ -19,6 +19,12 @@ services:
       - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   zoo2:
     image: confluentinc/cp-zookeeper:latest
@@ -38,6 +44,12 @@ services:
       - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2182"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   zoo3:
     image: confluentinc/cp-zookeeper:latest
@@ -57,6 +69,12 @@ services:
       - ./ssl:/etc/kafka/secrets
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2183"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   kafka1:
     image: confluentinc/cp-kafka:latest
@@ -92,11 +110,20 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
+      zoo1:
+        condition: service_healthy
+      zoo2:
+        condition: service_healthy
+      zoo3:
+        condition: service_healthy
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     env_file:
       - .env
 
@@ -134,11 +161,20 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
+      zoo1:
+        condition: service_healthy
+      zoo2:
+        condition: service_healthy
+      zoo3:
+        condition: service_healthy
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9093"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     env_file:
       - .env
 
@@ -176,11 +212,20 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - zoo1
-      - zoo2
-      - zoo3
+      zoo1:
+        condition: service_healthy
+      zoo2:
+        condition: service_healthy
+      zoo3:
+        condition: service_healthy
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9094"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     env_file:
       - .env
   
@@ -200,10 +245,13 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting adminClient...' && python3 -u main.py"
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+      kafka3:
+        condition: service_healthy
+    # command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 40 && echo 'Starting adminClient...' && python3 -u main.py"
     networks:
       - kafka-network
     env_file:
@@ -225,10 +273,13 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 50 && echo 'Starting producer...' && python3 -u main.py"
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+      kafka3:
+        condition: service_healthy
+    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 10 && echo 'Starting producer...' && python3 -u main.py"
     networks:
       - kafka-network
     env_file:
@@ -250,10 +301,13 @@ services:
     volumes:
       - ./ssl:/etc/kafka/secrets
     depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 50 && echo 'Starting consumer...' && python3 -u main.py"
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+      kafka3:
+        condition: service_healthy
+    command: sh -c "echo 'Waiting for Kafka to be ready...' && sleep 10 && echo 'Starting consumer...' && python3 -u main.py"
     networks:
       - kafka-network
     env_file:
