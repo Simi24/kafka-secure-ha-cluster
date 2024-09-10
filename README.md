@@ -23,12 +23,22 @@ This project demonstrates the setup of a secure, highly available Apache Kafka c
 
 1. **Clone the repository**
    ```
-   git clone https://github.com/Simi24/kafka-secure-ha-cluster.git
+   git clone https://github.com/your-username/kafka-secure-ha-cluster.git
    cd kafka-secure-ha-cluster
    ```
 
-2. **Generate SSL certificates**
-   Run the provided bash script to generate all necessary SSL certificates:
+2. **Customize and generate SSL certificates**
+   
+   a. Open the `generate_ssl_certs.sh` script in a text editor:
+   ```
+   nano generate_ssl_certs.sh
+   ```
+   
+   b. Modify the variables at the top of the script according to your needs. Pay special attention to the `PASSWORD` variable, as you'll need to use this value in the next steps.
+   
+   c. Save your changes and close the editor.
+   
+   d. Make the script executable and run it:
    ```
    chmod +x generate_ssl_certs.sh
    ./generate_ssl_certs.sh
@@ -39,18 +49,7 @@ This project demonstrates the setup of a secure, highly available Apache Kafka c
    ```
    cp .env.example .env
    ```
-   Edit the `.env` file to set your desired passwords and other configurations.
-
-4. **Build and start the containers**
-   ```
-   docker-compose up -d
-   ```
-
-5. **Verify the setup**
-   Check if all containers are up and running:
-   ```
-   docker-compose ps
-   ```
+   Edit the `.env` file to set your desired passwords and other configurations. Make sure the passwords here match the one you set in the `PASSWORD` variable of the SSL certificate generation script.
 
 ## Project Structure
 
@@ -69,6 +68,10 @@ This project uses the following security measures:
 - SSL/TLS encryption for all network communications.
 - SASL PLAIN authentication mechanism.
 - ACL (Access Control Lists) for authorization.
+
+The SSL certificates and keys are generated using a custom script. You can easily customize the certificate details and passwords by editing the variables at the top of the `generate_ssl_certs.sh` script before running it.
+
+Ensure that the passwords set in the SSL certificate generation script match those in your `.env` file for the system to work correctly.
 
 Refer to the `docker-compose.yml` file for detailed security configurations.
 
