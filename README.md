@@ -23,7 +23,7 @@ This project demonstrates the setup of a secure, highly available Apache Kafka c
 
 1. **Clone the repository**
    ```
-   git clone https://github.com/your-username/kafka-secure-ha-cluster.git
+   git clone https://github.com/Simi24/kafka-secure-ha-cluster.git
    cd kafka-secure-ha-cluster
    ```
 
