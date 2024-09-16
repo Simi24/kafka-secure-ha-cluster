@@ -83,4 +83,4 @@ cp ca-cert client.ca
 # Remove temporary files
 rm -f *-cert-file *-cert-signed *.p12
 
-echo "Certificati SSL generati con successo!"
+echo "Certificates created in the ssl folder"
