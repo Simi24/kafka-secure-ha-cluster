@@ -1,4 +1,4 @@
 # Remember to ignore .env in production
 # .env
-.ssl/*
-# !ssl/.gitkeep
+ssl/*
+!ssl/.gitkeep
