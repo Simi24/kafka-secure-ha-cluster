@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import traceback
 from kafka import KafkaAdminClient
 from kafka.admin import NewTopic
 from kafka.errors import KafkaError, TopicAlreadyExistsError
@@ -38,26 +39,31 @@ class KafkaAdminManager:
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     @circuit(failure_threshold=5, recovery_timeout=30)
     def create_topic(self, topic_name, num_partitions, replication_factor):
-        print(f"Attempting to create topic '{topic_name}'")
-        
-        # Check number of available brokers
-        cluster_metadata = self.admin_client.describe_cluster()
-        broker_count = len(cluster_metadata.brokers)
-        print(f"Number of available brokers: {broker_count}")
-
-        if replication_factor > broker_count:
-            print(f"Warning: Requested replication factor ({replication_factor}) is greater than the number of available brokers ({broker_count}). Setting replication factor to {broker_count}.")
-            replication_factor = broker_count
-
-        topic_list = [NewTopic(name=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
-        
+        #print(f"Attempting to create topic '{topic_name}'")
+    
         try:
+            print(f"Attempting to create topic '{topic_name}'")
+        
+            # Check number of available brokers
+            cluster_metadata = self.admin_client.describe_cluster()
+            broker_count = len(cluster_metadata['brokers'])
+            print(f"Number of available brokers: {broker_count}")
+
+            if replication_factor > broker_count:
+                print(f"Warning: Requested replication factor ({replication_factor}) is greater than the number of available brokers ({broker_count}). Setting replication factor to {broker_count}.")
+                replication_factor = broker_count
+
+            topic_list = [NewTopic(name=topic_name, num_partitions=num_partitions, replication_factor=replication_factor)]
+        
             self.admin_client.create_topics(new_topics=topic_list, validate_only=False)
             print(f"Topic '{topic_name}' created successfully.")
+        
         except TopicAlreadyExistsError:
             print(f"Topic '{topic_name}' already exists.")
+        
         except Exception as e:
             print(f"Error creating topic '{topic_name}': {str(e)}")
+            print(traceback.format_exc())  
             raise
 
     def close(self):
