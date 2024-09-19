@@ -1,6 +1,6 @@
 echo "Starting demo"
 
-konsole --noclose -e bash -c "docker-compose up --build" 2>/dev/null &
+konsole --noclose -e bash -c "docker-compose up --build --remove-orphans" 2>/dev/null &
 
 echo "Waiting for Kafka to be ready"
 {
@@ -16,6 +16,7 @@ konsole --noclose -e bash -c "docker-compose logs -f adminclient" 2>/dev/null &
 konsole --noclose -e bash -c "docker-compose logs -f consumer" 2>/dev/null &
 konsole --noclose -e bash -c "docker-compose logs -f producer" 2>/dev/null &
 
+sleep 15
 
 echo "Fault tolerance demo"
 echo "Stopping Kafka broker 1"
